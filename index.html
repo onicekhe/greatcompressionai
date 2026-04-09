@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Great Compression AI</title>
+  <meta name="description" content="Great Compression AI — a new framework for understanding AI, organization, and the future." />
+  <meta property="og:title" content="Great Compression AI" />
+  <meta property="og:description" content="Great Compression AI — a new framework for understanding AI, organization, and the future." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --white:   #f8f7f4;
+      --gray-1:  #1c1c1e;
+      --gray-2:  #3a3a3c;
+      --gray-3:  #8e8e93;
+      --gray-4:  #d1d1d6;
+      --blue:    #1a2a4a;
+      --blue-lt: #2c3e6a;
+      --serif:   'EB Garamond', Georgia, serif;
+      --sans:    'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Noise texture overlay ────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Language Switch ──────────────────────────────────────── */
+    #lang-toggle {
+      position: fixed;
+      top: 2rem;
+      right: 2.5rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      color: var(--gray-3);
+      transition: color 0.2s;
+      letter-spacing: 0.1em;
+    }
+
+    .lang-btn.active {
+      color: var(--black);
+      font-weight: 500;
+    }
+
+    .lang-sep {
+      color: var(--gray-4);
+      font-size: 0.65rem;
+      pointer-events: none;
+    }
+
+    /* ─── Sections ─────────────────────────────────────────────── */
+    section {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 7rem 2rem;
+    }
+
+    .inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ─── Divider ──────────────────────────────────────────────── */
+    .rule {
+      width: 40px;
+      height: 1px;
+      background: var(--gray-4);
+      margin: 0 auto 3.5rem;
+    }
+
+    /* ─── Hero ─────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 6rem;
+      background: var(--black);
+      color: var(--white);
+    }
+
+    /* subtle geometric line */
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--gray-3));
+    }
+
+    .hero-eyebrow {
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      margin-bottom: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.45s forwards;
+    }
+
+    .hero-subtitle {
+      font-family: var(--serif);
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--gray-3);
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.65s forwards;
+    }
+
+    .hero-statement {
+      font-family: var(--sans);
+      font-size: clamp(0.85rem, 1.8vw, 1rem);
+      font-weight: 300;
+      color: var(--gray-4);
+      max-width: 520px;
+      line-height: 1.9;
+      opacity: 0;
+      animation: fadeUp 1s 0.85s forwards;
+    }
+
+    .hero-statement strong {
+      color: var(--white);
+      font-weight: 400;
+    }
+
+    .hero-intro {
+      margin-top: 2.5rem;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--gray-3);
+      max-width: 480px;
+      line-height: 2;
+      opacity: 0;
+      animation: fadeUp 1s 1.05s forwards;
+    }
+
+    /* ─── Theory ───────────────────────────────────────────────── */
+    #theory {
+      background: var(--white);
+    }
+
+    .section-label {
+      font-family: var(--sans);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.25;
+      color: var(--black);
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-body {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--gray-2);
+      line-height: 2;
+      text-align: center;
+    }
+
+    .section-body p { margin-bottom: 1.4rem; }
+    .section-body p:last-child { margin-bottom: 0; }
+
+    /* staggered lines for theory */
+    .theory-lines {
+      font-family: var(--serif);
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      font-style: italic;
+      color: var(--gray-2);
+      line-height: 2.2;
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    /* ─── Professor ────────────────────────────────────────────── */
+    #professor {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    #professor .section-title { color: var(--white); }
+
+    #professor .section-body {
+      color: var(--gray-4);
+    }
+
+    /* ─── Book ─────────────────────────────────────────────────── */
+    #book {
+      background: var(--white);
+    }
+
+    /* book accent line */
+    .book-accent {
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, var(--gray-4), transparent);
+      margin: 0 auto 3rem;
+    }
+
+    /* ─── Contact ──────────────────────────────────────────────── */
+    #contact {
+      background: var(--gray-1);
+      color: var(--white);
+      padding-bottom: 0;
+    }
+
+    #contact .section-title { color: var(--white); }
+
+    .contact-email {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--gray-4);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gray-2);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .contact-email:hover {
+      color: var(--white);
+      border-color: var(--gray-3);
+    }
+
+    .contact-label {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--gray-3);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: var(--gray-1);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-top: 1px solid #2a2a2c;
+    }
+
+    .footer-name {
+      font-family: var(--serif);
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--gray-3);
+    }
+
+    .footer-copy {
+      margin-top: 0.6rem;
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--gray-2);
+    }
+
+    /* ─── Fade-in on scroll ────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Hero animation ───────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      #lang-toggle { top: 1.5rem; right: 1.5rem; }
+      section { padding: 5rem 1.5rem; }
+      #hero { padding: 7rem 1.5rem 5rem; }
+    }
+
+    /* ─── i18n visibility ──────────────────────────────────────── */
+    [data-lang="zh"] { display: none; }
+    body.lang-zh [data-lang="en"] { display: none; }
+    body.lang-zh [data-lang="zh"] { display: block; }
+    /* inline elements */
+    span[data-lang="zh"] { display: none; }
+    body.lang-zh span[data-lang="zh"] { display: inline; }
+    body.lang-zh span[data-lang="en"] { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Language Toggle ───────────────────────────────────────── -->
+  <nav id="lang-toggle" aria-label="Language">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <span class="lang-sep">/</span>
+    <button class="lang-btn" id="btn-zh" onclick="setLang('zh')">中文</button>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="hero">
+    <!-- EN -->
+    <div data-lang="en" style="text-align:center;">
+      <p class="hero-eyebrow">A New Theory &nbsp;·&nbsp; A New Book</p>
+      <h1 class="hero-title">Great Compression AI</h1>
+      <p class="hero-subtitle">The Great Compression Theory</p>
+      <p class="hero-statement">
+        In the age of AI, the Great Compression Theory was first proposed by<br />
+        <strong>Professor Jin Li of the University of Hong Kong.</strong>
+      </p>
+      <p class="hero-intro">
+        A new way to think about AI, organization, and the future.<br /><br />
+        In the age of artificial intelligence, we may need a new language to understand
+        how knowledge, decision-making, organizational roles, and human judgment
+        are being compressed, reorganized, and transformed.
+      </p>
+    </div>
+    <!-- ZH -->
+    <div data-lang="zh" style="text-align:center;">
+      <p class="hero-eyebrow">一个新理论 &nbsp;·&nbsp; 一本新书</p>
+      <h1 class="hero-title">大压缩理论</h1>
+      <p class="hero-subtitle">Great Compression AI</p>
+      <p class="hero-statement">
+        AI时代，大压缩理论（Great Compression AI）<br />
+        由<strong>香港大学李晋教授</strong>率先提出。
+      </p>
+      <p class="hero-intro">
+        一种重新理解 AI、组织与未来的方式。<br /><br />
+        在人工智能快速发展的时代，我们也许需要一种新的语言，
+        去理解知识、决策、组织角色与人的判断，
+        正在如何被重新压缩、重组与改变。
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 2 — THEORY
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="theory">
+    <div class="inner">
+      <!-- EN -->
+      <div data-lang="en" class="reveal">
+        <p class="section-label">Theory</p>
+        <div class="rule"></div>
+        <h2 class="section-title">A Theory Still Unfolding</h2>
+        <div class="section-body">
+          <p>Great Compression AI is not just about technological progress.</p>
+          <p>It is about what happens when information, processes, roles,<br />
+             knowledge, and judgment are continuously compressed by AI.</p>
+        </div>
+        <div class="theory-lines">
+          As compression deepens, organizations will change.<br />
+          Institutions will change.<br />
+          And the place of human beings inside systems<br />
+          may also need to be redefined.
+        </div>
+      </div>
+      <!-- ZH -->
+      <div data-lang="zh" class="reveal">
+        <p class="section-label">理论</p>
+        <div class="rule"></div>
+        <h2 class="section-title">一个仍在展开中的理论</h2>
+        <div class="section-body">
+          <p>大压缩理论关注的，并不只是技术如何进步。</p>
+          <p>它更关注的是：当信息、流程、角色、知识与判断<br />
+             不断被 AI 压缩之后，究竟会发生什么。</p>
+        </div>
+        <div class="theory-lines">
+          随着压缩不断加深，<br />
+          组织会改变，<br />
+          制度会改变，<br />
+          而人类在系统中的位置，<br />
+          也可能需要被重新定义。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 3 — PROFESSOR
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="professor">
+    <div class="inner">
+      <!-- EN -->
+      <div data-lang="en" class="reveal">
+        <p class="section-label" style="color:var(--gray-3);">About the Author</p>
+        <div class="rule"></div>
+        <h2 class="section-title">About Professor Jin Li</h2>
+        <div class="section-body" style="color:var(--gray-4);">
+          <p>
+            Prof. Jin Li is Professor at HKU Business School,
+            Zhang Yonghong Professor in Economics and Strategy,
+            Area Head of Management and Strategy, and Director of the
+            Centre for AI, Management and Organization at the
+            University of Hong Kong.
+          </p>
+          <p>
+            His work sits at the intersection of economics, organization,
+            incentives, and emerging technological change.
+          </p>
+        </div>
+      </div>
+      <!-- ZH -->
+      <div data-lang="zh" class="reveal">
+        <p class="section-label" style="color:var(--gray-3);">关于作者</p>
+        <div class="rule"></div>
+        <h2 class="section-title">关于李晋教授</h2>
+        <div class="section-body" style="color:var(--gray-4);">
+          <p>
+            李晋教授现任香港大学经管学院教授、
+            经济学与战略讲席教授、管理与策略学领域负责人，
+            并担任人工智能、管理与组织中心主任。
+          </p>
+          <p>
+            他的研究位于经济学、组织、激励机制与新兴技术变革的交叉地带。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 4 — BOOK
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="book">
+    <div class="inner">
+      <div class="book-accent"></div>
+      <!-- EN -->
+      <div data-lang="en" class="reveal">
+        <p class="section-label">The Book</p>
+        <div class="rule"></div>
+        <h2 class="section-title">About the Book</h2>
+        <div class="section-body">
+          <p>This book is not a simple response to the AI wave.</p>
+          <p>
+            It is an attempt to offer a deeper framework for understanding
+            what AI is really changing beneath the surface — not only in tools,
+            but in structures, institutions, and the ways people organize
+            value, knowledge, and action.
+          </p>
+          <p>We also hope that readers will enjoy the book.</p>
+        </div>
+      </div>
+      <!-- ZH -->
+      <div data-lang="zh" class="reveal">
+        <p class="section-label">这本书</p>
+        <div class="rule"></div>
+        <h2 class="section-title">关于这本书</h2>
+        <div class="section-body">
+          <p>这本书并不是对 AI 浪潮的简单回应。</p>
+          <p>
+            它更试图提供一个更深层的框架，去理解 AI 真正改变的是什么——
+            不仅是工具，更是结构、制度，
+            以及人们组织价值、知识与行动的方式。
+          </p>
+          <p>我们也期待所有读者会喜欢这本书。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 5 — CONTACT
+  ═══════════════════════════════════════════════════════════════ -->
+  <section id="contact">
+    <div class="inner" style="text-align:center; padding-bottom: 5rem;">
+      <!-- EN -->
+      <div data-lang="en" class="reveal">
+        <p class="section-label" style="color:var(--gray-3);">Contact</p>
+        <div class="rule"></div>
+        <h2 class="section-title">Contact</h2>
+        <p class="contact-label">For inquiries, please contact:</p>
+        <a class="contact-email" href="mailto:jli1@hku.hk">jli1@hku.hk</a>
+      </div>
+      <!-- ZH -->
+      <div data-lang="zh" class="reveal">
+        <p class="section-label" style="color:var(--gray-3);">联系</p>
+        <div class="rule"></div>
+        <h2 class="section-title">联系</h2>
+        <p class="contact-label">如需联系，请发送邮件至：</p>
+        <a class="contact-email" href="mailto:jli1@hku.hk">jli1@hku.hk</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer>
+    <p class="footer-name">Great Compression AI</p>
+    <p class="footer-copy">
+      <span data-lang="en">&copy; 2025 &nbsp;·&nbsp; All rights reserved</span>
+      <span data-lang="zh">&copy; 2025 &nbsp;·&nbsp; 保留所有权利</span>
+    </p>
+  </footer>
+
+  <!-- ── Scripts ────────────────────────────────────────────────── -->
+  <script>
+    /* ── Language Switch ── */
+    function setLang(lang) {
+      document.body.classList.toggle('lang-zh', lang === 'zh');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+      localStorage.setItem('gc-lang', lang);
+    }
+
+    (function () {
+      const saved = localStorage.getItem('gc-lang');
+      if (saved === 'zh') setLang('zh');
+    })();
+
+    /* ── Scroll Reveal ── */
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+  </script>
+</body>
+</html>
